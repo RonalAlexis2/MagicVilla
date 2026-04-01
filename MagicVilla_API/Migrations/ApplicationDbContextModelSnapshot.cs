@@ -28,7 +28,6 @@ namespace MagicVilla_API.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("DetalleEpecial")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("FechaActualizacion")
@@ -56,11 +55,9 @@ namespace MagicVilla_API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Amenidad")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Detalle")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("FechaActualizacion")
@@ -70,7 +67,6 @@ namespace MagicVilla_API.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ImagenUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MetrosCuadrados")
