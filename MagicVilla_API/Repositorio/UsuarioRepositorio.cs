@@ -57,9 +57,9 @@ namespace MagicVilla_API.Repositorio
             var token = tokenHandler.CreateToken(tokenDescriptor);
             LoginResponseDTO loginResponseDTO = new()
             {
-                Usuario = usuario.UserName,
-                Token = tokenHandler.WriteToken(token)
-            };
+                Token = tokenHandler.WriteToken(token),
+                Usuario = usuario
+            }; 
 
             return loginResponseDTO;
         }
@@ -78,5 +78,6 @@ namespace MagicVilla_API.Repositorio
             usuario.Password="";
             return usuario;
         }
+                
     }
 }
