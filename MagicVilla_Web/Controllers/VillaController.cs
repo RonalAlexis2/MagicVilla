@@ -3,42 +3,47 @@ using MagicVilla_Utilidad;
 using MagicVilla_Web.Models;
 using MagicVilla_Web.Models.Dto;
 using MagicVilla_Web.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace MagicVilla_Web.Controllers
 {
+
     public class VillaController : Controller
     {
-        private readonly IMapper _mapper;
         private readonly IVillaService _villaService;
-        public VillaController(IMapper mapper, IVillaService villaService)
+        private readonly IMapper _mapper;
+
+        public VillaController(IVillaService villaService, IMapper mapper)
         {
-            _mapper = mapper;
             _villaService = villaService;
+            _mapper = mapper;
         }
+
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> IndexVilla()
         {
-            List<VillaDto> VillaList = new();
+
+            List<VillaDto> villaList = new();
 
             var response = await _villaService.ObtenerTodos<APIResponse>(HttpContext.Session.GetString(DS.SessionToken));
 
             if (response != null && response.IsExitoso)
             {
-                VillaList = JsonConvert.DeserializeObject<List<VillaDto>>(Convert.ToString(response.Resultado));
+                villaList = JsonConvert.DeserializeObject<List<VillaDto>>(Convert.ToString(response.Resultado));
             }
 
-
-            return View(VillaList);
+            return View(villaList);
         }
 
-        //GET: Crear Villa
+        //Get
+
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> CrearVilla()
         {
             return View();
         }
-
-        //POST: Crear Villa
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -47,19 +52,19 @@ namespace MagicVilla_Web.Controllers
             if (ModelState.IsValid)
             {
                 var response = await _villaService.Crear<APIResponse>(modelo, HttpContext.Session.GetString(DS.SessionToken));
+
                 if (response != null && response.IsExitoso)
                 {
-                    TempData["exitoso"] = "Villa creada exitosamente";
+
+                    TempData["exitoso"] = "Villa Creada Exitosamente";
                     return RedirectToAction(nameof(IndexVilla));
                 }
             }
-
-            TempData["error"] = "Ocurrió un error al crear la villa";
             return View(modelo);
         }
 
 
-
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> ActualizarVilla(int villaId)
         {
             var response = await _villaService.Obtener<APIResponse>(villaId, HttpContext.Session.GetString(DS.SessionToken));
@@ -70,9 +75,7 @@ namespace MagicVilla_Web.Controllers
                 return View(_mapper.Map<VillaUpdateDto>(model));
             }
 
-            TempData["error"] = "Ocurrió un error al obtener la villa";
             return NotFound();
-
         }
 
         [HttpPost]
@@ -82,18 +85,18 @@ namespace MagicVilla_Web.Controllers
             if (ModelState.IsValid)
             {
                 var response = await _villaService.Actualizar<APIResponse>(modelo, HttpContext.Session.GetString(DS.SessionToken));
+
                 if (response != null && response.IsExitoso)
                 {
-                    TempData["exitoso"] = "Villa actualizada exitosamente";
+                    TempData["exitoso"] = "Villa Actualizada Exitosamente";
                     return RedirectToAction(nameof(IndexVilla));
                 }
             }
-
-            TempData["error"] = "Ocurrió un error al actualizar la villa";
             return View(modelo);
-
         }
 
+
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> RemoverVilla(int villaId)
         {
             var response = await _villaService.Obtener<APIResponse>(villaId, HttpContext.Session.GetString(DS.SessionToken));
@@ -103,25 +106,26 @@ namespace MagicVilla_Web.Controllers
                 VillaDto model = JsonConvert.DeserializeObject<VillaDto>(Convert.ToString(response.Resultado));
                 return View(model);
             }
-            return NotFound();
 
+            return NotFound();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoverVilla(VillaDto modelo)
         {
-           
-           var response = await _villaService.Remover<APIResponse>(modelo.Id, HttpContext.Session.GetString(DS.SessionToken));
-          
+
+            var response = await _villaService.Remover<APIResponse>(modelo.Id, HttpContext.Session.GetString(DS.SessionToken));
+
             if (response != null && response.IsExitoso)
             {
-                TempData["exitoso"] = "Villa eliminada exitosamente";
+                TempData["exitoso"] = "Villa Eliminada Exitosamente";
                 return RedirectToAction(nameof(IndexVilla));
             }
-            TempData["error"] = "Ocurrió un error al eliminar la villa";
+            TempData["error"] = "Ocurrio un Error al Remover";
             return View(modelo);
-
         }
+
+
     }
 }
